@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  base: '/',
+  base: '/react-task-5.2.9/',
   plugins: [react()],
   test: {
     globals: true,
