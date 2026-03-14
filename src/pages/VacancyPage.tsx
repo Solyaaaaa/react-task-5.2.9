@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { VacancyCard } from '../components/VacancyCard/VacancyCard';
 import { useEffect, useState } from 'react';
 import { HeaderVacancy } from '../components/HeaderVacancy/HeaderVacancy';
@@ -7,22 +7,27 @@ import type { Vacancy } from '../types/vacancy';
 
 const VacancyPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate()
   const [dataVacancy, setDataVacancy] = useState<Vacancy | null>(null);
 
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      navigate('/404')
+      return
+    };
     const fetchData = async () => {
       try {
         const response = await fetch(`https://api.hh.ru/vacancies/${id}`);
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          navigate('/404')
+          return
         }
         const result = await response.json();
         setDataVacancy(result);
       } catch (err) {
-        console.log(err);
-        setDataVacancy(null);
+        navigate('/404')
+      
       }
     };
 

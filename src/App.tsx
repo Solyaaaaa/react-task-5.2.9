@@ -20,9 +20,13 @@ export default function App() {
         <Route path="moscow" element={<VacancyList/>}/>
         <Route path="petersburg" element={<VacancyList/>}/>
       </Route>
-
+        
       <Route path="/vacancies/:id" element={<VacancyPage />} />
       <Route path="*" element={<NotFoundPage />} />
+      <Route path="/404" element={<NotFoundPage />} />
+
+      
+
 
     </Routes>
     </Suspense>
