@@ -1,4 +1,4 @@
-import '@mantine/core/styles.css';
+
 import {
   AppShell,
   Container,
@@ -12,24 +12,19 @@ import type { RootState, AppDispatch } from '../store/store';
 import { useEffect } from 'react';
 import {
   fetchVacancies,
-  setCity,
   setJob,
   setSkills,
 } from '../store/vacanciesSlice';
 import { HeaderVacancy } from '../components/HeaderVacancy/HeaderVacancy';
-import { VacancyList } from '../components/VacancyList/VacancyList';
 import { KeySkills } from '../components/KeySkills/KeySkills';
-import { CitySelect } from '../components/CitySelect/CitySelect';
 import { SearchBar } from '../components/SearchBar/SearchBar';
 import { PaginationVacancies } from '../components/PaginationVacancies/PaginationVacancies';
-import { useSearchParams } from 'react-router-dom';
+import { CityTabs } from '../components/CityTabs/CityTabs';
+import { Outlet, useSearchParams, useLocation } from 'react-router-dom';
 
  const VacanciesPage = () => {
   const searchJob = useSelector(
     (state: RootState) => state.vacancies.searchJob
-  );
-  const selectedCity = useSelector(
-    (state: RootState) => state.vacancies.selectedCity
   );
   const keySkills = useSelector(
     (state: RootState) => state.vacancies.keySkills
@@ -45,38 +40,36 @@ import { useSearchParams } from 'react-router-dom';
   const dispatch = useDispatch<AppDispatch>();
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const city = location.pathname.includes('petersburg') ? 'Санкт-Петербург' : 'Москва';
 
   const text = searchParams.get('text');
-  const area = searchParams.get('area');
   const skills = searchParams.getAll('skill_set');
 
   useEffect(() => {
     if (text) dispatch(setJob(text));
-    if (area) dispatch(setCity(area));
     if (skills.length > 0) dispatch(setSkills(skills));
-  }, [text, area, skills.join(',')]);
+  }, [text, skills.join(',')]);
 
   useEffect(() => {
     const params = new URLSearchParams();
 
     if (searchJob) params.set('text', searchJob);
-    if (selectedCity && selectedCity !== 'Все города')
-      params.set('area', selectedCity);
     keySkills.forEach((skill) => params.append('skill_set', skill));
 
     setSearchParams(params);
-  }, [searchJob, selectedCity, keySkills]);
+  }, [searchJob, keySkills]);
 
   useEffect(() => {
     dispatch(
       fetchVacancies({
         search: searchJob,
-        area: selectedCity,
+        area: city,
         skill: keySkills,
         page: currentPage - 1,
       })
     );
-  }, [dispatch, searchJob, selectedCity, keySkills, currentPage]);
+  }, [dispatch, searchJob, city, keySkills, currentPage]);
 
   return (
     <AppShell header={{ height: 60 }}>
@@ -88,14 +81,15 @@ import { useSearchParams } from 'react-router-dom';
           <Group align="flex-start" gap={24} justify="space-between" pb={24}>
             <Stack w={317}>
               <KeySkills />
-              <CitySelect />
+              
             </Stack>
 
-            <Stack style={{ flex: 1 }} align="center">
+            <Stack style={{ flex: 1 }} align="flex-start">
+              <CityTabs/>
               {status === 'loading' ? (
                 <Loader color="blue" type="dots" />
               ) : (
-                <VacancyList />
+                <Outlet />
               )}
 
               {totalPages !== 1 && status === 'resolved' && (

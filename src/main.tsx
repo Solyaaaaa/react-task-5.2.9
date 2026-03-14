@@ -5,6 +5,8 @@ import { Provider } from 'react-redux'
 import { store } from './store/store.ts'
 import { HashRouter } from 'react-router-dom'
 import { MantineProvider } from '@mantine/core'
+import '@mantine/core/styles.css';
+
 
 
 
